@@ -10,7 +10,7 @@ import { toErrorMap } from './util/toErrorMap';
 
 interface LoginProps {}
 
-const Register: React.FC<LoginProps> = ({}) => {
+const Login: React.FC<LoginProps> = () => {
   const [, login] = useLoginMutation();
   const router = useRouter();
   return (
@@ -20,6 +20,7 @@ const Register: React.FC<LoginProps> = ({}) => {
         onSubmit={async (values, { setErrors }) => {
           const response = await login({ options: values });
           if (response.data?.login.errors) {
+            console.log(response.data.login.errors);
             setErrors(toErrorMap(response.data.login.errors));
           } else if (response.data?.login.user) {
             router.push('/');
@@ -55,4 +56,4 @@ const Register: React.FC<LoginProps> = ({}) => {
     </Wrapper>
   );
 };
-export default Register;
+export default Login;

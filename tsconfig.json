@@ -22,7 +22,13 @@
     "strict": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true
   },
   "include": [
     ".eslintrc.js",

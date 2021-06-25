@@ -118,11 +118,14 @@ export class UserResolver {
       };
     }
     const validPassword = await argon2.verify(user.password, options.password);
+    console.log(!validPassword);
+    console.log('user.password: ', user.password);
+    console.log('options.password: ', options.password);
     if (!validPassword) {
       return {
         errors: [
           {
-            field: 'passsword',
+            field: 'password',
             message: 'invalid Password',
           },
         ],
