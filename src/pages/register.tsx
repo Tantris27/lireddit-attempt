@@ -1,5 +1,5 @@
 import { Box } from '@chakra-ui/core';
-import { Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
+import { Button } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
 import { useRouter } from 'next/router';
 import React from 'react';
