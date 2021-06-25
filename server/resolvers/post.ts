@@ -35,6 +35,7 @@ export class PostResolver {
     if (!post) {
       return null;
     }
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (typeof title !== undefined) {
       post.title = title;
       await em.persistAndFlush(post);

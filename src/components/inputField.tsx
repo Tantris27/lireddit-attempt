@@ -15,6 +15,7 @@ type InputFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
 
 export const InputField: React.FC<InputFieldProps> = ({
   label,
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   size: _,
   ...props
 }) => {

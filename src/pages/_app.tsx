@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ChakraProvider, ColorModeProvider } from '@chakra-ui/react';
 import { Cache, cacheExchange, QueryInput } from '@urql/exchange-graphcache';
 import { AppProps } from 'next/app';
@@ -5,7 +6,7 @@ import { createClient, dedupExchange, fetchExchange, Provider } from 'urql';
 import { Layout } from '../components/Layout';
 import {
   LoginMutation,
-  MeDocument,
+  meDocument,
   MeQuery,
   RegisterMutation,
 } from '../generated/graphql';
@@ -32,7 +33,7 @@ const client = createClient({
           login: (result, args, cache, info) =>
             betterUpdateQuery<LoginMutation, MeQuery>(
               cache,
-              { query: MeDocument },
+              { query: meDocument },
               result,
               (queryResult, query) => {
                 if (queryResult.login.errors) {
@@ -47,7 +48,7 @@ const client = createClient({
           register: (result, args, cache, info) =>
             betterUpdateQuery<RegisterMutation, MeQuery>(
               cache,
-              { query: MeDocument },
+              { query: meDocument },
               result,
               (queryResult, query) => {
                 if (queryResult.register.errors) {
