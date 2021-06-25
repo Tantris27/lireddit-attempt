@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { MikroORM } from '@mikro-orm/core';
 import { ApolloServer } from 'apollo-server-express';
 import connectRedis from 'connect-redis';
+import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 import next from 'next';
@@ -30,7 +31,12 @@ const main = async () => {
 
     const redisStore = connectRedis(session);
     const redisClient = redis.createClient();
-
+    app.use(
+      cors({
+        origin: 'http://localhost:3000',
+        credentials: true,
+      }),
+    );
     app.use(
       session({
         name: 'sid',
@@ -59,7 +65,10 @@ const main = async () => {
       }),
       context: ({ req, res }): MyContext => ({ em: orm.em, req, res }),
     });
-    apolloApp.applyMiddleware({ app });
+    apolloApp.applyMiddleware({
+      app,
+      cors: false,
+    });
 
     // const post = orm.em.create(Post, { title: 'my first Post' });
     // await orm.em.persistAndFlush(post);

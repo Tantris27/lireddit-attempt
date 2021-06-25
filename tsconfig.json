@@ -2,11 +2,8 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "UpLeveled Node + React TSConfig",
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "skipLibCheck": true,
     "module": "esnext",
     "target": "es2015",
     "moduleResolution": "node",
@@ -21,10 +18,11 @@
     "jsxImportSource": "@emotion/react",
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true,
+    "noUnusedLocals": true,
     "strict": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "noUnusedParameters": true
   },
   "include": [
     ".eslintrc.js",
@@ -33,10 +31,7 @@
     "**/*.tsx",
     "**/*.js"
   ],
-  "exclude": [
-    "node_modules",
-    "build"
-  ],
+  "exclude": ["node_modules", "build"],
   "ts-node": {
     "compilerOptions": {
       "module": "commonjs"
