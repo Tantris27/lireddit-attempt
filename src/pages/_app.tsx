@@ -1,11 +1,69 @@
 import { ChakraProvider, ColorModeProvider } from '@chakra-ui/react';
+import { Cache, cacheExchange, QueryInput } from '@urql/exchange-graphcache';
 import { AppProps } from 'next/app';
-import { createClient, Provider } from 'urql';
+import { createClient, dedupExchange, fetchExchange, Provider } from 'urql';
 import { Layout } from '../components/Layout';
+import {
+  LoginMutation,
+  MeDocument,
+  MeQuery,
+  RegisterMutation,
+} from '../generated/graphql';
 import theme from '../theme';
 
+function betterUpdateQuery<Result, Query>(
+  cache: Cache,
+  queryInput: QueryInput,
+  queryResult: any,
+  updateFunction: (functionResult: Result, query: Query) => Query,
+) {
+  return cache.updateQuery(
+    queryInput,
+    (data) => updateFunction(queryResult, data as any) as any,
+  );
+}
 const client = createClient({
   url: 'http://localhost:4000/graphql',
+  exchanges: [
+    dedupExchange,
+    cacheExchange({
+      updates: {
+        Mutation: {
+          login: (result, args, cache, info) =>
+            betterUpdateQuery<LoginMutation, MeQuery>(
+              cache,
+              { query: MeDocument },
+              result,
+              (queryResult, query) => {
+                if (queryResult.login.errors) {
+                  return query;
+                } else {
+                  return {
+                    me: queryResult.login.user,
+                  };
+                }
+              },
+            ),
+          register: (result, args, cache, info) =>
+            betterUpdateQuery<RegisterMutation, MeQuery>(
+              cache,
+              { query: MeDocument },
+              result,
+              (queryResult, query) => {
+                if (queryResult.register.errors) {
+                  return query;
+                } else {
+                  return {
+                    me: queryResult.register.user,
+                  };
+                }
+              },
+            ),
+        },
+      },
+    }),
+    fetchExchange,
+  ],
   fetchOptions: {
     credentials: 'include',
   },
@@ -13,8 +71,8 @@ const client = createClient({
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <Layout>
-      <Provider value={client}>
+    <Provider value={client}>
+      <Layout>
         <ChakraProvider resetCSS theme={theme}>
           <ColorModeProvider
             options={{
@@ -24,8 +82,8 @@ function MyApp({ Component, pageProps }: AppProps) {
             <Component {...pageProps} />
           </ColorModeProvider>
         </ChakraProvider>
-      </Provider>
-    </Layout>
+      </Layout>
+    </Provider>
   );
 }
 
