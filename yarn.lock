@@ -2653,10 +2653,10 @@
     "@typescript-eslint/types" "4.28.0"
     eslint-visitor-keys "^2.0.0"
 
-"@upleveled/eslint-config-upleveled@1.14.4":
-  version "1.14.4"
-  resolved "https://registry.yarnpkg.com/@upleveled/eslint-config-upleveled/-/eslint-config-upleveled-1.14.4.tgz#93fb707f56c874e2150252d0f12573099f647529"
-  integrity sha512-aFzj4TRdGSlquLyQxcwftscSVZ4hYLW1AdjpFgsYx0ZrFiHyJnpjjyucZperccYJTAAhi/XwSxSHCeCQt6QYKg==
+"@upleveled/eslint-config-upleveled@1.14.5":
+  version "1.14.5"
+  resolved "https://registry.yarnpkg.com/@upleveled/eslint-config-upleveled/-/eslint-config-upleveled-1.14.5.tgz#7d3b251c4d680fe1c3b2205705bac0a3060630a4"
+  integrity sha512-ZyBvCcRzAUBYcQJ+tBRT5tvBFtSXbRKeHqidz3fytO8V1CiavV5gbpBTWdSCD9J7ycuqwViBoRNXwyRMS3bTwA==
 
 "@urql/core@>=2.1.4", "@urql/core@^2.1.4":
   version "2.1.4"
@@ -7407,11 +7407,6 @@ node-addon-api@^3.0.2:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.2.1.tgz#81325e0a2117789c0128dab65e7e38f07ceba161"
   integrity sha512-mmcei9JghVNDYydghQmeDX8KoAm0FAiYyIcUt/N4nhyAipB17pllZQDOJD2fotxABnt4Mdz+dKTO7eftLg4d0A==
 
-node-bin-setup@^1.0.0:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/node-bin-setup/-/node-bin-setup-1.0.6.tgz#4b5c9bb937ece702d7069b36ca78af4684677528"
-  integrity sha512-uPIxXNis1CRbv1DwqAxkgBk5NFV3s7cMN/Gf556jSw6jBvV7ca4F9lRL/8cALcZecRibeqU+5dFYqFFmzv5a0Q==
-
 node-fetch@2.6.1, node-fetch@^2.6.1:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
@@ -7462,13 +7457,6 @@ node-releases@^1.1.71:
   version "1.1.73"
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.73.tgz#dd4e81ddd5277ff846b80b52bb40c49edf7a7b20"
   integrity sha512-uW7fodD6pyW2FZNZnp/Z3hvWKeEW1Y8R1+1CnErE8cXFXzl5blBOoVB41CvMer6P6Q0S5FXDwcHgFd1Wj0U9zg==
-
-node@latest:
-  version "16.3.0"
-  resolved "https://registry.yarnpkg.com/node/-/node-16.3.0.tgz#87f2cf826936634faf91407f40dfaa44cf2389f2"
-  integrity sha512-aNOLBP7p6GS0CdsFTR3JjXd/kSfOYt6UvXL+UX7Fu+fIMr04lsZWpE+Y8CQOprwfrqnFSq3bkIscrAiZieM/kg==
-  dependencies:
-    node-bin-setup "^1.0.0"
 
 nopt@^5.0.0:
   version "5.0.0"

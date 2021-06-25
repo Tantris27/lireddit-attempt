@@ -20,7 +20,7 @@ const linkStyle = css`
   }
 `;
 const linkStyle2 = css`
-  margin: 8px 15px 8px auto;
+  margin: 8px 10px 8px auto;
   font-weight: 500;
   :hover {
     color: whitesmoke;
