@@ -6,7 +6,7 @@ import { createClient, dedupExchange, fetchExchange, Provider } from 'urql';
 import { Layout } from '../components/Layout';
 import {
   LoginMutation,
-  meDocument,
+  MeDocument,
   MeQuery,
   RegisterMutation,
 } from '../generated/graphql';
@@ -30,10 +30,17 @@ const client = createClient({
     cacheExchange({
       updates: {
         Mutation: {
+          logout: (result, args, cache, info) =>
+            betterUpdateQuery<LogoutMutation, MeQuery>(
+              cache,
+              { query: MeDocument },
+              result,
+              () => ({ me: null }),
+            ),
           login: (result, args, cache, info) =>
             betterUpdateQuery<LoginMutation, MeQuery>(
               cache,
-              { query: meDocument },
+              { query: MeDocument },
               result,
               (queryResult, query) => {
                 if (queryResult.login.errors) {
@@ -48,7 +55,7 @@ const client = createClient({
           register: (result, args, cache, info) =>
             betterUpdateQuery<RegisterMutation, MeQuery>(
               cache,
-              { query: meDocument },
+              { query: MeDocument },
               result,
               (queryResult, query) => {
                 if (queryResult.register.errors) {

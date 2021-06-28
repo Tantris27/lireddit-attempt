@@ -1,7 +1,7 @@
 import { Box, Button, Flex } from '@chakra-ui/react';
 import { css } from '@emotion/core';
 import Link from 'next/link';
-import { useMeQuery } from '../generated/graphql';
+import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 
 const boxStyle = css`
   background-color: #9ae6b4;
@@ -53,6 +53,7 @@ const buttonStyle = css`
 interface NavbarProps {}
 
 export const Navbar: React.FC<NavbarProps> = () => {
+  const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
   const [{ data, fetching }] = useMeQuery();
   let body = null;
   // data loads
@@ -81,7 +82,12 @@ export const Navbar: React.FC<NavbarProps> = () => {
         <Link href="/">
           <a css={linkStyle2}>{data.me.username}</a>
         </Link>
-        <Button css={buttonStyle} colorScheme="tomato">
+        <Button
+          css={buttonStyle}
+          colorScheme="tomato"
+          isLoading={logoutFetching}
+          onClick={async () => await logout()}
+        >
           Logout
         </Button>
       </>

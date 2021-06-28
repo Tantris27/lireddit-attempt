@@ -8,7 +8,7 @@ import session from 'express-session';
 import next from 'next';
 import redis from 'redis';
 import { buildSchema } from 'type-graphql';
-import { _prod_ } from './constants';
+import { _prod_, COOKIE_NAME } from './constants';
 import mikroConfig from './mikro-orm.config';
 import { HelloResolver } from './resolvers/hello';
 import { PostResolver } from './resolvers/post';
@@ -39,7 +39,7 @@ const main = async () => {
     );
     app.use(
       session({
-        name: 'sid',
+        name: COOKIE_NAME,
         store: new redisStore({
           client: redisClient,
           // disables TimeToLast so the session stays alive forever !!!Change Later!!!
