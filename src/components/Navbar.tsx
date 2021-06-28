@@ -1,7 +1,10 @@
 import { Box, Button, Flex } from '@chakra-ui/react';
 import { css } from '@emotion/core';
+import { withUrqlClient } from 'next-urql';
 import Link from 'next/link';
 import { useLogoutMutation, useMeQuery } from '../generated/graphql';
+import { createUrqlClient } from '../pages/util/createUrqlClient';
+import { isServer } from '../pages/util/isServer';
 
 const boxStyle = css`
   background-color: #9ae6b4;
@@ -52,9 +55,9 @@ const buttonStyle = css`
 
 interface NavbarProps {}
 
-export const Navbar: React.FC<NavbarProps> = () => {
+const Navbar: React.FC<NavbarProps> = () => {
   const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
-  const [{ data, fetching }] = useMeQuery();
+  const [{ data, fetching }] = useMeQuery({ pause: isServer() });
   let body = null;
   // data loads
   if (fetching) {
@@ -105,3 +108,4 @@ export const Navbar: React.FC<NavbarProps> = () => {
     </Box>
   );
 };
+export default withUrqlClient(createUrqlClient)(Navbar);

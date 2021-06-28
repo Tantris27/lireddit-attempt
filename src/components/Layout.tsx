@@ -1,5 +1,5 @@
 import { css, Global } from '@emotion/react';
-import { Navbar } from './Navbar';
+import Navbar from './Navbar';
 
 interface LayoutProps {}
 
