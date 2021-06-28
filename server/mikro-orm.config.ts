@@ -17,4 +17,7 @@ export default {
     path: path.join(__dirname, './migrations'),
     pattern: /^[\w-]+\d+\.[tj]s$/,
   },
+  // discovery: {
+  //   tsConfigPath: '../tsconfig.json',
+  // },
 } as Parameters<typeof MikroORM.init>[0];

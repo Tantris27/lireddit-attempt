@@ -15,9 +15,12 @@ import { PostResolver } from './resolvers/post';
 import { UserResolver } from './resolvers/user';
 import { MyContext } from './types';
 
+// import { sendEmail } from './utils/sendEmail';
+
 // import { Post } from './entities/Post';
 
 const main = async () => {
+  // sendEmail('bob@bob.com', 'hello there');
   // Calles the Database through mikro-orm with the variables set in the config
   const orm = await MikroORM.init(mikroConfig);
   // ?????
