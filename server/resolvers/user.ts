@@ -3,7 +3,6 @@ import {
   Arg,
   Ctx,
   Field,
-  InputType,
   Mutation,
   ObjectType,
   Query,
@@ -13,16 +12,17 @@ import { COOKIE_NAME } from '../constants';
 import { User } from '../entities/User';
 import { MyContext } from '../types';
 import { validateRegister } from '../utils/validateRegister';
+import { UsernamePasswordInput } from './UsernamePasswordInput';
 
-@InputType()
-class UsernamePasswordInput {
-  @Field(() => String)
-  username!: string;
-  @Field(() => String)
-  email!: string;
-  @Field(() => String)
-  password!: string;
-}
+// @InputType()
+// class UsernamePasswordInput {
+//   @Field(() => String)
+//   username!: string;
+//   @Field(() => String)
+//   email!: string;
+//   @Field(() => String)
+//   password!: string;
+// }
 @ObjectType()
 class FieldError {
   @Field(() => String)
@@ -75,6 +75,7 @@ export class UserResolver {
     const hashedPassword = await argon2.hash(options.password);
     const user = await em.create(User, {
       username: options.username,
+      email: options.email,
       password: hashedPassword,
     });
     try {
