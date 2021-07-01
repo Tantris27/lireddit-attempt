@@ -15,6 +15,7 @@ import { PostResolver } from './resolvers/post';
 import { UserResolver } from './resolvers/user';
 import { MyContext } from './types';
 
+// import { User } from './entities/User';
 // import { sendEmail } from './utils/sendEmail';
 
 // import { Post } from './entities/Post';
@@ -24,6 +25,7 @@ const main = async () => {
   // Calles the Database through mikro-orm with the variables set in the config
   const orm = await MikroORM.init(mikroConfig);
   // ?????
+  // await orm.em.nativeDelete(User, {});
   await orm.getMigrator().up();
 
   const dev = process.env.NODE_ENV !== 'production';

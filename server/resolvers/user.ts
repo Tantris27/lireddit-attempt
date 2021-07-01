@@ -12,11 +12,14 @@ import {
 import { COOKIE_NAME } from '../constants';
 import { User } from '../entities/User';
 import { MyContext } from '../types';
+import { validateRegister } from '../utils/validateRegister';
 
 @InputType()
 class UsernamePasswordInput {
   @Field(() => String)
   username!: string;
+  @Field(() => String)
+  email!: string;
   @Field(() => String)
   password!: string;
 }
@@ -64,25 +67,9 @@ export class UserResolver {
     @Arg('options', () => UsernamePasswordInput) options: UsernamePasswordInput,
     @Ctx() { em, req }: MyContext,
   ): Promise<UserResponse> {
-    if (options.username.length <= 3) {
-      return {
-        errors: [
-          {
-            field: 'username',
-            message: 'length must be grater than 3',
-          },
-        ],
-      };
-    }
-    if (options.password.length <= 3) {
-      return {
-        errors: [
-          {
-            field: 'password',
-            message: 'length must be grater than 3',
-          },
-        ],
-      };
+    const errors = await validateRegister(options);
+    if (errors) {
+      return { errors };
     }
     const hashedPassword = await argon2.hash(options.password);
     const user = await em.create(User, {
@@ -103,19 +90,27 @@ export class UserResolver {
           ],
         };
       }
-      // Will login after registration by setting a cookie
-      req.session.userId = user.id;
-      return { user };
     }
-
+    // Will login after registration by setting a cookie
+    req.session.userId = user.id;
     return { user };
   }
+
+  // return { user };
+  // }
   @Mutation(() => UserResponse)
   async login(
-    @Arg('options', () => UsernamePasswordInput) options: UsernamePasswordInput,
+    @Arg('usernameOrEmail')
+    usernameOrEmail: string,
+    @Arg('password') password: string,
     @Ctx() { em, req }: MyContext,
   ) {
-    const user = await em.findOne(User, { username: options.username });
+    const user = await em.findOne(
+      User,
+      usernameOrEmail.includes('@')
+        ? { email: usernameOrEmail }
+        : { username: usernameOrEmail },
+    );
     if (!user) {
       return {
         errors: [
@@ -126,7 +121,7 @@ export class UserResolver {
         ],
       };
     }
-    const validPassword = await argon2.verify(user.password, options.password);
+    const validPassword = await argon2.verify(user.password, password);
     // console.log(!validPassword);
     // console.log('user.password: ', user.password);
     // console.log('options.password: ', options.password);
@@ -148,7 +143,7 @@ export class UserResolver {
     return new Promise((response) =>
       req.session.destroy((err) => {
         if (err) {
-          console.log(err);
+          // console.log(err);
           response(false);
         }
         res.clearCookie(COOKIE_NAME);
