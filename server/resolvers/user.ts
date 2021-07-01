@@ -67,7 +67,8 @@ export class UserResolver {
     @Arg('options', () => UsernamePasswordInput) options: UsernamePasswordInput,
     @Ctx() { em, req }: MyContext,
   ): Promise<UserResponse> {
-    const errors = await validateRegister(options);
+    const reponse = validateRegister(options);
+    const errors = await reponse;
     if (errors) {
       return { errors };
     }
@@ -115,7 +116,7 @@ export class UserResolver {
       return {
         errors: [
           {
-            field: 'username',
+            field: 'usernameOrEmail',
             message: "that username doesn't exist",
           },
         ],
