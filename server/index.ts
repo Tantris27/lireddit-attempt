@@ -5,15 +5,16 @@ import connectRedis from 'connect-redis';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
+import Redis from 'ioredis';
 import next from 'next';
-import redis from 'redis';
 import { buildSchema } from 'type-graphql';
 import { _prod_, COOKIE_NAME } from './constants';
 import mikroConfig from './mikro-orm.config';
 import { HelloResolver } from './resolvers/hello';
 import { PostResolver } from './resolvers/post';
 import { UserResolver } from './resolvers/user';
-import { MyContext } from './types';
+
+// import { MyContext } from './types';
 
 // import { User } from './entities/User';
 // import { sendEmail } from './utils/sendEmail';
@@ -35,7 +36,7 @@ const main = async () => {
     const app = express();
 
     const redisStore = connectRedis(session);
-    const redisClient = redis.createClient();
+    const redis = new Redis();
     app.use(
       cors({
         origin: 'http://localhost:3000',
@@ -46,7 +47,7 @@ const main = async () => {
       session({
         name: COOKIE_NAME,
         store: new redisStore({
-          client: redisClient,
+          client: redis,
           // disables TimeToLast so the session stays alive forever !!!Change Later!!!
           // disableTTL: true,
           disableTouch: true,
@@ -68,7 +69,7 @@ const main = async () => {
         resolvers: [HelloResolver, PostResolver, UserResolver],
         validate: false,
       }),
-      context: ({ req, res }): MyContext => ({ em: orm.em, req, res }),
+      context: ({ req, res }) => ({ em: orm.em, req, res, redis }),
     });
     apolloApp.applyMiddleware({
       app,
