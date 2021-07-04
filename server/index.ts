@@ -26,6 +26,8 @@ const main = async () => {
     entities: [Post, User],
   });
   console.log(connection);
+  // Incase i need to delete Posts again
+  // await Post.delete({});
   const dev = process.env.NODE_ENV !== 'production';
   const appNext = next({ dev });
   // const handle = appNext.getRequestHandler();

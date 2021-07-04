@@ -4,9 +4,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Post } from './Post';
 
 @ObjectType()
 @Entity()
@@ -14,14 +16,6 @@ export class User extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id!: number;
-
-  @Field(() => String)
-  @CreateDateColumn()
-  createdAt: Date = new Date();
-
-  @Field(() => String)
-  @UpdateDateColumn()
-  updatedAt: Date = new Date();
 
   @Field()
   @Column({ unique: true })
@@ -34,4 +28,16 @@ export class User extends BaseEntity {
   // @Field(() => String)
   @Column()
   password!: string;
+
+  @OneToMany(() => Post, (post) => post.originalPoster)
+  //  Maybe have to change the ? to something else
+  posts?: Post[];
+
+  @Field(() => String)
+  @CreateDateColumn()
+  createdAt: Date = new Date();
+
+  @Field(() => String)
+  @UpdateDateColumn()
+  updatedAt: Date = new Date();
 }
