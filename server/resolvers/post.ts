@@ -1,72 +1,58 @@
-import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Mutation, Query, Resolver } from 'type-graphql';
 import { Post } from '../entities/Post';
-import { MyContext } from '../types';
 
 @Resolver()
 export class PostResolver {
   @Query(() => [Post])
-  posts(@Ctx() { em }: MyContext): Promise<Post[]> {
-    return em.find(Post, {});
+  posts(): Promise<Post[]> {
+    return Post.find();
   }
   @Query(() => Post, { nullable: true })
-  post(
-    @Arg('id', () => Int) id: number,
-    @Ctx() { em }: MyContext,
-  ): Promise<Post | null> {
-    return em.findOne(Post, { id });
+  post(@Arg('id') id: number): Promise<Post | undefined> {
+    return Post.findOne(id);
   }
   @Mutation(() => Post)
-  async createPost(
-    @Arg('title', () => String) title: string,
-    @Ctx() { em }: MyContext,
-  ): Promise<Post> {
-    const post = em.create(Post, { title });
-    await em.persistAndFlush(post);
-    return post;
+  async createPost(@Arg('title') title: string): Promise<Post> {
+    return Post.create({ title }).save();
   }
   @Mutation(() => Post, { nullable: true })
   async updatePost(
-    @Arg('id', () => Int) id: number,
-    @Arg('title', () => String) title: string,
-    @Ctx() { em }: MyContext,
+    @Arg('id') id: number,
+    @Arg('title') title: string,
   ): Promise<Post | null> {
-    const post = await em.findOne(Post, { id });
+    const post = await Post.findOne({ where: { id } });
     await console.log(post);
     if (!post) {
       return null;
     }
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (typeof title !== undefined) {
-      post.title = title;
-      await em.persistAndFlush(post);
+      await Post.update({ id }, { title });
     }
     return post;
   }
   @Mutation(() => Boolean)
-  async deletePost(
-    @Arg('id', () => Int) id: number,
-    @Ctx() { em }: MyContext,
-  ): Promise<boolean> {
+  async deletePost(@Arg('id') id: number): Promise<boolean> {
     try {
-      await em.nativeDelete(Post, { id });
+      await Post.delete({ id });
     } catch {
       return false;
     }
 
     return true;
   }
-  @Mutation(() => Boolean)
-  async deleteByTitlePost(
-    @Arg('title', () => String) title: string,
+  // @Mutation(() => Boolean)
+  // async deleteByTitlePost(
+  //   @Arg('title', () => String) title: string,
 
-    @Ctx() { em }: MyContext,
-  ): Promise<boolean> {
-    try {
-      await em.nativeDelete(Post, { title });
-    } catch {
-      return false;
-    }
+  //   @Ctx() { em }: MyContext,
+  // ): Promise<boolean> {
+  //   try {
+  //     await em.nativeDelete(Post, { title });
+  //   } catch {
+  //     return false;
+  //   }
 
-    return true;
-  }
+  //   return true;
+  // }
 }

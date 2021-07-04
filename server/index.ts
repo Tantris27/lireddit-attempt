@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import { MikroORM } from '@mikro-orm/core';
 import { ApolloServer } from 'apollo-server-express';
 import connectRedis from 'connect-redis';
 import cors from 'cors';
@@ -8,27 +7,25 @@ import session from 'express-session';
 import Redis from 'ioredis';
 import next from 'next';
 import { buildSchema } from 'type-graphql';
+import { createConnection } from 'typeorm';
 import { _prod_, COOKIE_NAME } from './constants';
-import mikroConfig from './mikro-orm.config';
+import { Post } from './entities/Post';
+import { User } from './entities/User';
 import { HelloResolver } from './resolvers/hello';
 import { PostResolver } from './resolvers/post';
 import { UserResolver } from './resolvers/user';
 
-// import { MyContext } from './types';
-
-// import { User } from './entities/User';
-// import { sendEmail } from './utils/sendEmail';
-
-// import { Post } from './entities/Post';
-
 const main = async () => {
-  // sendEmail('bob@bob.com', 'hello there');
-  // Calles the Database through mikro-orm with the variables set in the config
-  const orm = await MikroORM.init(mikroConfig);
-  // ?????
-  // await orm.em.nativeDelete(User, {});
-  await orm.getMigrator().up();
-
+  const connection = await createConnection({
+    type: 'postgres',
+    database: 'lireddit',
+    username: 'lireddit',
+    password: 'lireddit',
+    logging: true,
+    synchronize: true,
+    entities: [Post, User],
+  });
+  console.log(connection);
   const dev = process.env.NODE_ENV !== 'production';
   const appNext = next({ dev });
   // const handle = appNext.getRequestHandler();
@@ -69,7 +66,7 @@ const main = async () => {
         resolvers: [HelloResolver, PostResolver, UserResolver],
         validate: false,
       }),
-      context: ({ req, res }) => ({ em: orm.em, req, res, redis }),
+      context: ({ req, res }) => ({ req, res, redis }),
     });
     apolloApp.applyMiddleware({
       app,
@@ -80,7 +77,7 @@ const main = async () => {
     // await orm.em.persistAndFlush(post);
 
     app.listen(4000, () => {
-      console.log('App started on http://Localhost:4000');
+      console.log('App started on http://Localhost:4000/graphql');
     });
   });
 };
