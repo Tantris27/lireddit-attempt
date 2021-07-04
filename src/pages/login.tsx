@@ -1,7 +1,8 @@
 import { Box } from '@chakra-ui/core';
-import { Button } from '@chakra-ui/react';
+import { Button, Flex, Link } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
 import { withUrqlClient } from 'next-urql';
+import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { InputField } from '../components/inputField';
@@ -23,7 +24,7 @@ const Login: React.FC<LoginProps> = () => {
         onSubmit={async (values, { setErrors }) => {
           const response = await login(values);
           if (response.data?.login.errors) {
-            console.log(response.data.login.errors);
+            // console.log(response.data.login.errors);
             setErrors(toErrorMap(response.data.login.errors));
           } else if (response.data?.login.user) {
             router.push('/');
@@ -45,6 +46,11 @@ const Login: React.FC<LoginProps> = () => {
                 type="password"
               />
             </Box>
+            <Flex>
+              <Link ml="auto" mt={1}>
+                <NextLink href="/forgot-password">Forgot Password ?</NextLink>
+              </Link>
+            </Flex>
             <Button
               mt={4}
               type="submit"

@@ -47,7 +47,7 @@ export class UserResolver {
   async changePassword(
     @Arg('token') token: string,
     @Arg('newPassword') newPassword: string,
-    @Ctx() { redis, em }: MyContext,
+    @Ctx() { redis, em, req }: MyContext,
   ): Promise<UserResponse> {
     if (newPassword.length < 3) {
       return {
@@ -60,21 +60,33 @@ export class UserResolver {
     if (!userId) {
       return { errors: [{ field: 'token', message: 'token expired' }] };
     }
-    const user = await em.findOne(User, { id: parseInt(userId) });
+    const intId = parseInt(userId);
+    const user = await em.findOne(User, { id: intId });
     if (!user) {
       return { errors: [{ field: 'token', message: "User doesn't exist" }] };
     }
     user.password = await argon2.hash(newPassword);
-    em.persistAndFlush(user);
+    await em.persistAndFlush(user);
+
+    // delete the token after completion (uncomment after testing)
+    // redis.del(FORGET_PASSWORD_PREFIX + token);
+
+    // log in the user
+    req.session.userId = intId;
     return { user };
   }
 
   @Mutation(() => Boolean)
   async forgotPassword(
-    @Arg('email') email: string,
+    @Arg('usernameOrEmail') usernameOrEmail: string,
     @Ctx() { em, redis }: MyContext,
   ) {
-    const user = await em.findOne(User, { email });
+    const user = await em.findOne(
+      User,
+      usernameOrEmail.includes('@')
+        ? { email: usernameOrEmail }
+        : { username: usernameOrEmail },
+    );
     if (!user) {
       // no user with email in database
       return true;
@@ -88,7 +100,7 @@ export class UserResolver {
     ); // 3 Stunden
 
     await sendEmail(
-      email,
+      user.email,
       `<a href="http://localhost:3000/change-password/${token}">reset password<a>`,
     );
     return true;
