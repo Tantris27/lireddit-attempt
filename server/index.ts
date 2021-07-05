@@ -24,7 +24,7 @@ const main = async () => {
     username: 'lireddit',
     password: 'lireddit',
 
-    logging: true,
+    // logging: true,
     synchronize: true,
     migrations: [path.join(__dirname + '/migrations/**')],
     entities: [Post, User],

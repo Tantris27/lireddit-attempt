@@ -28,7 +28,8 @@ class PostInput {
 export class PostResolver {
   @FieldResolver(() => String)
   textSnippet(@Root() root: Post) {
-    return root.text.slice(0, 50) + '...';
+    // what if the Post is smaller than 70Chars ? ... seems weird
+    return root.text.slice(0, 70) + '...';
   }
   @Query(() => [Post])
   async posts(
