@@ -18,16 +18,18 @@ const Login: React.FC<LoginProps> = () => {
   const router = useRouter();
   return (
     <Wrapper variant="small">
-      {/* <h1>Login</h1> */}
       <Formik
         initialValues={{ usernameOrEmail: '', password: '' }}
         onSubmit={async (values, { setErrors }) => {
           const response = await login(values);
           if (response.data?.login.errors) {
-            // console.log(response.data.login.errors);
             setErrors(toErrorMap(response.data.login.errors));
           } else if (response.data?.login.user) {
-            router.push('/');
+            if (typeof router.query.next === 'string') {
+              router.push(router.query.next);
+            } else {
+              router.push('/');
+            }
           }
         }}
       >
@@ -47,9 +49,11 @@ const Login: React.FC<LoginProps> = () => {
               />
             </Box>
             <Flex>
-              <Link ml="auto" mt={1}>
-                <NextLink href="/forgot-password">Forgot Password ?</NextLink>
-              </Link>
+              <NextLink href="/forgot-password">
+                <Link ml="auto" mt={1}>
+                  Forgot Password ?
+                </Link>
+              </NextLink>
             </Flex>
             <Button
               mt={4}

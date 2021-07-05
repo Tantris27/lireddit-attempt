@@ -6,6 +6,8 @@ import express from 'express';
 import session from 'express-session';
 import Redis from 'ioredis';
 import next from 'next';
+// eslint-disable-next-line unicorn/prefer-node-protocol
+import path from 'path';
 import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
 import { _prod_, COOKIE_NAME } from './constants';
@@ -21,11 +23,15 @@ const main = async () => {
     database: 'lireddit',
     username: 'lireddit',
     password: 'lireddit',
+
     logging: true,
     synchronize: true,
+    migrations: [path.join(__dirname + '/migrations/**')],
     entities: [Post, User],
   });
   console.log(connection);
+  await connection.runMigrations();
+
   // Incase i need to delete Posts again
   // await Post.delete({});
   const dev = process.env.NODE_ENV !== 'production';

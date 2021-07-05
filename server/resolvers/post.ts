@@ -3,11 +3,13 @@ import {
   Ctx,
   Field,
   InputType,
+  Int,
   Mutation,
   Query,
   Resolver,
   UseMiddleware,
 } from 'type-graphql';
+import { getRepository } from 'typeorm';
 import { Post } from '../entities/Post';
 import { isAuth } from '../middleware/isAuthenticated';
 import { MyContext } from '../types';
@@ -23,13 +25,27 @@ class PostInput {
 @Resolver()
 export class PostResolver {
   @Query(() => [Post])
-  posts(): Promise<Post[]> {
-    return Post.find();
+  async posts(
+    @Arg('limit', () => Int) limit: number,
+    @Arg('cursor', () => String, { nullable: true }) cursor: string,
+  ): Promise<Post[]> {
+    const realLimit = Math.min(50, limit);
+    const qb = getRepository(Post)
+      .createQueryBuilder('postz')
+      .orderBy('"createdAt"', 'DESC')
+      .take(realLimit);
+
+    if (cursor) {
+      qb.where('"createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) });
+    }
+    return qb.getMany();
   }
+
   @Query(() => Post, { nullable: true })
   post(@Arg('id') id: number): Promise<Post | undefined> {
     return Post.findOne(id);
   }
+
   @Mutation(() => Post)
   @UseMiddleware(isAuth)
   async createPost(
@@ -38,16 +54,16 @@ export class PostResolver {
   ): Promise<Post> {
     return Post.create({
       ...input,
-      originalPosterId: parseInt(req.session.id),
+      originalPosterId: req.session.userId,
     }).save();
   }
+
   @Mutation(() => Post, { nullable: true })
   async updatePost(
     @Arg('id') id: number,
     @Arg('title') title: string,
   ): Promise<Post | null> {
     const post = await Post.findOne({ where: { id } });
-    await console.log(post);
     if (!post) {
       return null;
     }
@@ -57,6 +73,7 @@ export class PostResolver {
     }
     return post;
   }
+
   @Mutation(() => Boolean)
   async deletePost(@Arg('id') id: number): Promise<boolean> {
     try {
@@ -67,18 +84,4 @@ export class PostResolver {
 
     return true;
   }
-  // @Mutation(() => Boolean)
-  // async deleteByTitlePost(
-  //   @Arg('title', () => String) title: string,
-
-  //   @Ctx() { em }: MyContext,
-  // ): Promise<boolean> {
-  //   try {
-  //     await em.nativeDelete(Post, { title });
-  //   } catch {
-  //     return false;
-  //   }
-
-  //   return true;
-  // }
 }

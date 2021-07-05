@@ -11,6 +11,9 @@ const boxStyle = css`
   padding: 8px;
   border-bottom: solid 1px black;
   border-top: solid 1px black;
+  z-index: 1;
+  position: sticky;
+  top: 0;
 `;
 const linkStyle = css`
   margin: 8px 15px 8px;
@@ -102,6 +105,9 @@ const Navbar: React.FC<NavbarProps> = () => {
         {' '}
         <Link href="/">
           <a css={linkStyle}>Home</a>
+        </Link>
+        <Link href="/create-post">
+          <a css={linkStyle}>Post</a>
         </Link>
         {body}
       </Flex>
