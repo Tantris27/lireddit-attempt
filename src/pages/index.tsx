@@ -9,12 +9,17 @@ import {
 } from '@chakra-ui/react';
 import { withUrqlClient } from 'next-urql';
 import NextLink from 'next/link';
+import { useState } from 'react';
 import { Wrapper } from '../components/Wrapper';
 import { usePostsQuery } from '../generated/graphql';
 import { createUrqlClient } from './util/createUrqlClient';
 
 const Index = () => {
-  const [{ data, fetching }] = usePostsQuery({ variables: { limit: 10 } });
+  const [variables, setVariables] = useState({
+    limit: 25,
+    cursor: null as null | string,
+  });
+  const [{ data, fetching }] = usePostsQuery({ variables });
   if (!fetching && !data) {
     return <div>For some Reason there are no Posts</div>;
   }
@@ -43,19 +48,35 @@ const Index = () => {
       ) : (
         <>
           <Stack spacing={8}>
-            {data!.posts.map((post) => (
+            {data!.posts.posts.map((post) => (
               <Box key={post.id} p={5} shadow="md" borderWidth="1px">
-                <Heading fontSize="xl">{post.title}</Heading>
+                <Heading fontSize="xl">
+                  {post.title}
+                  {'    '}
+                  {post.id}
+                </Heading>
                 <Text mt={4}>{post.textSnippet}</Text>
               </Box>
             ))}
           </Stack>
-          {/* Maybe put button in separate conditional renderin  for just(data) */}
-          <Flex>
-            <Button m="auto" my={8} isLoading={fetching}>
-              Load More Posts
-            </Button>{' '}
-          </Flex>
+          {data && data.posts.hasMore ? (
+            <Flex>
+              <Button
+                m="auto"
+                my={8}
+                isLoading={fetching}
+                onClick={() => {
+                  setVariables({
+                    limit: variables.limit,
+                    cursor:
+                      data.posts.posts[data.posts.posts.length - 1].createdAt,
+                  });
+                }}
+              >
+                Load More Posts
+              </Button>{' '}
+            </Flex>
+          ) : null}
         </>
       )}
     </Wrapper>
