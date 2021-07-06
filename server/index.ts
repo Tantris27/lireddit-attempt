@@ -29,7 +29,7 @@ const main = async () => {
     migrations: [path.join(__dirname + '/migrations/*')],
     entities: [Post, User],
   });
-  console.log(connection);
+  // console.log(connection);
   await connection.runMigrations();
 
   // Incase i need to delete Posts again

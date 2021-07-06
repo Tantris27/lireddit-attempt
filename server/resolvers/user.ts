@@ -3,10 +3,12 @@ import {
   Arg,
   Ctx,
   Field,
+  FieldResolver,
   Mutation,
   ObjectType,
   Query,
   Resolver,
+  Root,
 } from 'type-graphql';
 import { getConnection } from 'typeorm';
 import { v4 } from 'uuid';
@@ -33,8 +35,18 @@ class UserResponse {
   user?: User;
 }
 
-@Resolver()
+@Resolver(User)
 export class UserResolver {
+  @FieldResolver(() => String)
+  email(@Root() user: User, @Ctx() { req }: MyContext) {
+    // current User wants to see his own password
+    if (req.session.userId === user.id) {
+      return user.email;
+    }
+    // current User wants to see a foreign password
+    return '';
+  }
+
   @Mutation(() => UserResponse)
   async changePassword(
     @Arg('token') token: string,
@@ -122,11 +134,6 @@ export class UserResolver {
     const hashedPassword = await argon2.hash(options.password);
     let user;
     try {
-      // const result = await User.create({
-      //   username: options.username,
-      //   email: options.email,
-      //   password: hashedPassword,
-      // }).save();
       const result = await getConnection()
         .createQueryBuilder()
         .insert()

@@ -25,11 +25,15 @@ export class User extends BaseEntity {
   @Column({ unique: true })
   email!: string;
 
+  @Field()
+  @Column()
+  upvotes!: string;
+
   // @Field(() => String)
   @Column()
   password!: string;
 
-  @OneToMany(() => Post, (post) => post.originalPoster)
+  @OneToMany(() => Post, (post) => post.creator)
   //  Maybe have to change the ? to something else
   posts?: Post[];
 

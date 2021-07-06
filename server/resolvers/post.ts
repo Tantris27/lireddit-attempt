@@ -12,7 +12,7 @@ import {
   Root,
   UseMiddleware,
 } from 'type-graphql';
-import { getRepository } from 'typeorm';
+import { getConnection } from 'typeorm';
 import { Post } from '../entities/Post';
 import { isAuth } from '../middleware/isAuthenticated';
 import { MyContext } from '../types';
@@ -38,6 +38,7 @@ export class PostResolver {
     // what if the Post is smaller than 70Chars ? ... seems weird
     return root.text.slice(0, 70) + '...';
   }
+
   @Query(() => PaginatedPosts)
   async posts(
     @Arg('limit', () => Int) limit: number,
@@ -46,16 +47,29 @@ export class PostResolver {
     const realLimit = Math.min(50, limit);
     // Loading more than we are gonna show to check if there are more posts or we reached the end
     const realLimitPlusOne = realLimit + 1;
-    const qb = getRepository(Post)
-      .createQueryBuilder('posts')
-      .orderBy('"createdAt"', 'DESC')
-      .take(realLimitPlusOne);
-
+    const sqlReplacements: any[] = [realLimitPlusOne];
     if (cursor) {
-      qb.where('"createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) });
+      sqlReplacements.push(new Date(parseInt(cursor)));
     }
-
-    const postsFetched = await qb.getMany();
+    const postsFetched = await getConnection().query(
+      `
+    SELECT p.*,
+    json_build_object(
+      'id', u.id,
+      'username' , u.username,
+      'email', u.email,
+      'createdAt', u."createdAt",
+      'updatedAt', u."updatedAt"
+       )creator
+    FROM post p
+    INNER JOIN public.user u ON u.id = p."creatorId"
+${cursor ? `WHERE p."createdAt" < $2` : ''}
+    ORDER BY p."createdAt" DESC
+    LIMIT $1
+    `,
+      sqlReplacements,
+    );
+    console.log(postsFetched);
     return {
       posts: postsFetched.slice(0, realLimit),
       hasMore: postsFetched.length === realLimitPlusOne,
@@ -75,7 +89,7 @@ export class PostResolver {
   ): Promise<Post> {
     return Post.create({
       ...input,
-      originalPosterId: req.session.userId,
+      creatorId: req.session.userId,
     }).save();
   }
 
