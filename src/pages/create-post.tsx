@@ -24,7 +24,7 @@ const CreatePost: React.FC<CreatePostProps> = () => {
         // Enter validation
         onSubmit={async (values) => {
           const { error } = await createPost({ input: values });
-          console.log(error);
+          // console.log(error);
           if (!error) {
             router.push('/');
           }

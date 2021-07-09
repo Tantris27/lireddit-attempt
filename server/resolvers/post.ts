@@ -14,6 +14,7 @@ import {
 } from 'type-graphql';
 import { getConnection } from 'typeorm';
 import { Post } from '../entities/Post';
+import { Upvote } from '../entities/Upvote';
 import { isAuth } from '../middleware/isAuthenticated';
 import { MyContext } from '../types';
 
@@ -37,6 +38,57 @@ export class PostResolver {
   textSnippet(@Root() root: Post) {
     // what if the Post is smaller than 70Chars ? ... seems weird
     return root.text.slice(0, 70) + '...';
+  }
+  @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
+  async vote(
+    @Arg('postId', () => Int) postId: number,
+    @Arg('value', () => Int) value: number,
+    @Ctx() { req }: MyContext,
+  ) {
+    const userId = req.session.userId;
+    const isUpvote = value !== -1;
+    const realValue = isUpvote ? 1 : -1;
+    const voteAlready = await Upvote.findOne({
+      where: { postId, voterId: userId },
+    });
+    if (voteAlready && voteAlready.value !== realValue) {
+      getConnection().transaction(async (tm) => {
+        await tm.query(
+          `update upvote
+          set value = $1
+          where "postId"= $2 and "voterId"=$3`,
+          [realValue, postId, userId],
+        );
+        await tm.query(
+          `update post
+        set points = points + $1
+        where id = $2;`,
+          [2 * realValue, postId],
+        );
+      });
+    } else if (!voteAlready) {
+      getConnection().transaction(async (tm) => {
+        await tm.query(
+          `    insert into upvote ("voterId","postId","value")
+      values($1,$2,$3);`,
+          [userId, postId, realValue],
+        );
+        await tm.query(
+          `update post
+        set points = points + $1
+        where id = $2;`,
+          [realValue, postId],
+        );
+      });
+    }
+    // getConnection().query(
+    //   `START TRANSACTION;
+
+    // COMMIT;
+    // `,
+    // );
+    return true;
   }
 
   @Query(() => PaginatedPosts)
@@ -69,7 +121,6 @@ ${cursor ? `WHERE p."createdAt" < $2` : ''}
     `,
       sqlReplacements,
     );
-    console.log(postsFetched);
     return {
       posts: postsFetched.slice(0, realLimit),
       hasMore: postsFetched.length === realLimitPlusOne,

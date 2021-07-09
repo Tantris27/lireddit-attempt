@@ -1,8 +1,10 @@
+import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
   Flex,
   Heading,
+  IconButton,
   Link,
   Stack,
   Text,
@@ -10,8 +12,10 @@ import {
 import { withUrqlClient } from 'next-urql';
 import NextLink from 'next/link';
 import { useState } from 'react';
+import { Post } from '../../server/entities/Post';
+import { VoteSection } from '../components/voteSection';
 import { Wrapper } from '../components/Wrapper';
-import { usePostsQuery } from '../generated/graphql';
+import { PostsDocument, usePostsQuery } from '../generated/graphql';
 import { createUrqlClient } from './util/createUrqlClient';
 
 const Index = () => {
@@ -49,14 +53,14 @@ const Index = () => {
         <>
           <Stack spacing={8}>
             {data!.posts.posts.map((post) => (
-              <Box key={post.id} p={5} shadow="md" borderWidth="1px">
-                <Heading fontSize="xl">
-                  {post.title}
-                  {'    '}
-                  {post.id}
-                </Heading>
-                <Text mt={4}>{post.textSnippet}</Text>
-              </Box>
+              <Flex key={post.id} p={5} shadow="md" borderWidth="1px">
+                <VoteSection post={post} />
+                <Box>
+                  <Heading fontSize="xl">{post.title}</Heading>
+                  <Text mt={4}> posted by {post.creator.username}</Text>
+                  <Text mt={4}>{post.textSnippet}</Text>
+                </Box>
+              </Flex>
             ))}
           </Stack>
           {data && data.posts.hasMore ? (
@@ -74,7 +78,7 @@ const Index = () => {
                 }}
               >
                 Load More Posts
-              </Button>{' '}
+              </Button>
             </Flex>
           ) : null}
         </>
