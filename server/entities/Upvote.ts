@@ -8,21 +8,21 @@ import { User } from './User';
 export class Upvote extends BaseEntity {
   @Field()
   @Column({ type: 'int' })
-  value?: number;
+  value!: number;
 
   @Field()
   @PrimaryColumn()
-  postId?: number;
+  postId!: number;
 
   @Field(() => Post)
   @ManyToOne(() => Post, (post) => post.upvotes)
-  post?: User;
+  post!: User;
 
   @Field()
   @PrimaryColumn()
-  voterId?: number;
+  voterId!: number;
 
   @Field(() => User)
   @ManyToOne(() => User, (user) => user.upvotes)
-  voter?: User;
+  voter!: User;
 }

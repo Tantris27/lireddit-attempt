@@ -1,10 +1,8 @@
-import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
   Flex,
   Heading,
-  IconButton,
   Link,
   Stack,
   Text,
@@ -12,10 +10,9 @@ import {
 import { withUrqlClient } from 'next-urql';
 import NextLink from 'next/link';
 import { useState } from 'react';
-import { Post } from '../../server/entities/Post';
 import { VoteSection } from '../components/voteSection';
 import { Wrapper } from '../components/Wrapper';
-import { PostsDocument, usePostsQuery } from '../generated/graphql';
+import { usePostsQuery } from '../generated/graphql';
 import { createUrqlClient } from './util/createUrqlClient';
 
 const Index = () => {
@@ -56,6 +53,7 @@ const Index = () => {
               <Flex key={post.id} p={5} shadow="md" borderWidth="1px">
                 <VoteSection post={post} />
                 <Box>
+                  {console.log('index.voteStatus', post.voteStatus)}
                   <Heading fontSize="xl">{post.title}</Heading>
                   <Text mt={4}> posted by {post.creator.username}</Text>
                   <Text mt={4}>{post.textSnippet}</Text>

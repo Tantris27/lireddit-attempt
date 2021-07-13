@@ -11,25 +11,50 @@ interface VoteSectionProps {
 
 export const VoteSection: React.FC<VoteSectionProps> = ({ post }) => {
   const [, vote] = useVoteMutation();
+  // console.log(post.voteStatus);
   return (
-    <Flex direction="column" justifyContent="center" alignItems="center" mr={4}>
+    <Flex
+      direction="column"
+      justifyContent="center"
+      alignItems="center"
+      mr={4}
+      // width="25px"
+    >
       <Box>
         <IconButton
           icon={<ChevronUpIcon />}
           name="chevron-up"
-          size="24px"
           aria-label="downvoteButton"
-          onClick={() => vote({ postId: post.id, value: 1 })}
+          colorScheme="green"
+          // {post.voteStatus === 1 ? 'green' : undefined}
+          onClick={async () => {
+            if (post.voteStatus === 1) {
+              return;
+            }
+            await vote({ postId: post.id, value: 1 });
+          }}
+          size="sm"
+          borderRadius="5px"
         />
       </Box>
-      <Box>{post.points}</Box>
+      <Box marginTop="5px" marginBottom="5px">
+        {post.points}
+      </Box>
       <Box>
         <IconButton
+          size="sm"
           icon={<ChevronDownIcon />}
           aria-label="upvoteButton"
           name="chevron-down"
-          size="30px"
-          onClick={() => vote({ postId: post.id, value: -1 })}
+          colorScheme="red"
+          // {post.voteStatus === -1 ? 'red' : undefined}
+          borderRadius="5px"
+          onClick={async () => {
+            if (post.voteStatus === -1) {
+              return;
+            }
+            await vote({ postId: post.id, value: -1 });
+          }}
         />
       </Box>
     </Flex>

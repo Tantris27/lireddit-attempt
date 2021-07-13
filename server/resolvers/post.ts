@@ -57,7 +57,7 @@ export class PostResolver {
         await tm.query(
           `update upvote
           set value = $1
-          where "postId"= $2 and "voterId"=$3`,
+          where "postId" = $2 and "voterId" = $3`,
           [realValue, postId, userId],
         );
         await tm.query(
@@ -95,14 +95,21 @@ export class PostResolver {
   async posts(
     @Arg('limit', () => Int) limit: number,
     @Arg('cursor', () => String, { nullable: true }) cursor: string | null,
+    @Ctx() { req }: MyContext,
   ): Promise<PaginatedPosts> {
     const realLimit = Math.min(50, limit);
     // Loading more than we are gonna show to check if there are more posts or we reached the end
     const realLimitPlusOne = realLimit + 1;
+    // const userId = await req.session.userId;
+    console.log('before:', req.session);
     const sqlReplacements: any[] = [realLimitPlusOne];
+    if (req.session.userId) {
+      sqlReplacements.push(req.session.userId);
+    }
     if (cursor) {
       sqlReplacements.push(new Date(parseInt(cursor)));
     }
+    console.log('after:', req.session.userId);
     const postsFetched = await getConnection().query(
       `
     SELECT p.*,
@@ -112,10 +119,15 @@ export class PostResolver {
       'email', u.email,
       'createdAt', u."createdAt",
       'updatedAt', u."updatedAt"
-       )creator
+       )creator,
+    ${
+      req.session.userId
+        ? '(select value from upvote where "voterId"= $2 and "postId" = post.id)as "voteStatus"'
+        : 'null as "voteStatus"'
+    }
     FROM post p
     INNER JOIN public.user u ON u.id = p."creatorId"
-${cursor ? `WHERE p."createdAt" < $2` : ''}
+${cursor ? `WHERE p."createdAt" < $3` : ''}
     ORDER BY p."createdAt" DESC
     LIMIT $1
     `,
